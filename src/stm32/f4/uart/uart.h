@@ -1,17 +1,22 @@
 /* cosmicOS usart.h - USART HAL
  * @author: SL7
- *
+ * ├ ╰ ─ │
  * Changelog v2:
- *   |__v2.1
- *   |    |__ changed to USART port struct
- *   |    |__ added interrupt setting
- *   |    |__ added interrupt driven write/printf
- *   |    |__ ?
+ *   ├── v2.1
+ *   │    ├── changed to USART port struct
+ *   │    ├── added interrupt setting
+ *   │    ├── added interrupt driven write/printf
+ *   │    ├── added interrupt driven read
+ *   │    ├── added interrupt scan function
+ *   │    ├── added RX available function (`USART_available()`)
+ *   │    ╰── 
  *
  *
  * TODO: [x] select option on interrupt driven
  * TODO: [x] implement interrupt driven write 
- * TODO: [ ] implement interrupt driven read 
+ * TODO: [x] implement interrupt driven read 
+ * TODO: [x] fix interrupt read string fracturing error
+ * TODO: [ ] write interrupt for all other USART ports
  * TODO: [ ] write docs
  */
 
@@ -121,24 +126,10 @@
 
 #define ENABLE      1
 #define DISABLE     0
-
-/**
- * @brief USART port settings structure
- */
-typedef struct _USART_port {
-    USART_TypeDef *usart;           /*!< USART port */
-    uint32_t baud;                  /*!< USART baud rate */
-    uint32_t mode;                  /*!< USART mode */
-    uint32_t stop_bits;             /*!< USART stop bit setting */
-    uint32_t parity_enable;         /*!< USART enable parity */
-    uint32_t parity_even_odd;       /*!< USART parity even or odd */
-    bool interrupt_driven;          /*!< USART interrupt setting */
-} USART_port;
-
 /**
  * USART buffer when interrupt driven USART
  */
-typedef struct {
+typedef struct __usart_interrupt_buffer {
     char tx_buf[USART_IT_TX_BUF_SIZE];    /*!< TX buffer */
     char rx_buf[USART_IT_RX_BUF_SIZE];    /*!< RX buffer */
     uint32_t tx_in;                     /*!< tx buffer index in     */
@@ -147,6 +138,22 @@ typedef struct {
     uint32_t rx_out;                    /*!< RX buffer index out    */
     bool tx_restart;                    /*!< restart TX buffer      */
 } __usart_it_buf;
+
+/**
+ * @brief USART port settings structure
+ * TODO: [ ] fix printf bug where it shows wrong big value on 64-bit integers
+ */
+typedef struct _USART_port {
+    USART_TypeDef *usart;           /*!< USART port */
+    __usart_it_buf *__it_buf;
+    uint32_t baud;                  /*!< USART baud rate */
+    uint32_t mode;                  /*!< USART mode */
+    uint32_t stop_bits;             /*!< USART stop bit setting */
+    uint32_t parity_enable;         /*!< USART enable parity */
+    uint32_t parity_even_odd;       /*!< USART parity even or odd */
+    bool interrupt_driven;          /*!< USART interrupt setting */
+} USART_port;
+
 
 /**
  * USART error codes
@@ -193,12 +200,13 @@ uint16_t USART_compute_div(uint32_t periph_clk, uint32_t baud);
 usart_err_t USART_init(USART_port *port);
 
 usart_err_t USART_write(USART_port *port, int ch);
-usart_err_t USART_printf(USART_port *port, const char *format, ...);
+usart_err_t USART_printf(USART_port port, const char *format, ...);
 
 int16_t USART_read(USART_port *port);
 uint8_t USART_getc(USART_port *port);
-usart_err_t USART_scan(USART_port *port, char *buf);
+usart_err_t USART_scan(USART_port port, char *buf, int len);
 usart_err_t USART_input_echo(USART_port *port);
+bool USART_available(USART_port port);
 
 bool USART_has_input(USART_port *port);
 

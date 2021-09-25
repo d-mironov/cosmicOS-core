@@ -37,12 +37,13 @@ int main(void) {
         .stop_bits = 0,
         .parity_enable = 0,
         .parity_even_odd = 0,
-        .interrupt_driven = false,
+        .interrupt_driven = true,
     };
     GPIO_enable(DEBUG_LED, GPIO_OUTPUT);
     GPIO_enable(PA8, GPIO_OUTPUT);
     
     USART_init(&port);   
+    
     //I2C_init(&i2c1);
 
     //USART_init(USART2, 115200, USART_RX_TX_MODE, USART_STOPBITS_1, USART_PARITY_NEN, USART_PARITY_EVEN); 
@@ -53,22 +54,30 @@ int main(void) {
     //I2C_write_burst(&i2c1, MPU_ADDR, 0x6B, 1, init); 
     //const clock_t *test = &RCC_25MHZ_TO_84MHZ;
     char usart_test[255] = {0};
-    uint64_t cycle = 0; 
+    long int cycle = 0; 
     uint8_t bit_test = 0;
     //setbit(bit_test, 4);
     //USART_printf(&port, "Test bitutils: %d\n", bit_test);
 
     //USART_printf(&port, "CCR value: %.12f\n", _I2C_ccr_calc(&i2c1));
     //USART_printf(&port, "TRISE value: %.12f\n", _I2C_trise_calc(&i2c1));
+    
     while (1) {
         GPIO_toggle(DEBUG_LED);
-        delayMs(300);
+        delayMs(500);
         
         //char ch = USART_getc(&port);
         //USART_printf(&port, "getc: %c\n", ch);
-        USART_scan(&port, usart_test);
-        USART_printf(&port, "%s\n", usart_test);
-        USART_printf(&port, "Cycle: %d\n", cycle++);
+        //USART_scan(port, usart_test, 255);
+        USART_printf(port, "%s\n", usart_test);
+        if (USART_printf(port, "Cycle: %d\n", cycle++) != USART_OK) {
+            USART_printf(port, "[x] printing did not work\n");
+        }
+        if (USART_available(port)) {
+            USART_printf(port, "[+] USART2 input available\n");
+        }
+        USART_scan(port, usart_test, 255);
+
             //GPIO_toggle(PA8);
         //USART_printf(&port, "%c", USART_read(&port));
         //USART_printf(USART2, "This is a value: %.3f\n", 2.123);

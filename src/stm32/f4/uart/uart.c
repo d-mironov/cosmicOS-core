@@ -31,6 +31,7 @@ usart_err_t USART_init(USART_port *port) {
         GPIO_select_alternate(USART1_TX, GPIO_AF07);
         RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
         (port->usart)->BRR = USART_compute_div(USARTx_CLK, port->baud); 
+        port->__it_buf = &__buf_usart1;
     } else if (port->usart == USART2) {
         //RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
         GPIO_enable(USART2_RX, GPIO_ALTERNATE); 
@@ -39,6 +40,7 @@ usart_err_t USART_init(USART_port *port) {
         GPIO_select_alternate(USART2_TX, GPIO_AF07);
         RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
         (port->usart)->BRR = USART_compute_div(USART2_CLK, port->baud); 
+        port->__it_buf = &__buf_usart2;
     } else if (port->usart == USART6) {
         //RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
         GPIO_enable(USART6_RX, GPIO_ALTERNATE); 
@@ -47,6 +49,8 @@ usart_err_t USART_init(USART_port *port) {
         GPIO_select_alternate(USART6_TX, GPIO_AF07);
         RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
         (port->usart)->BRR = USART_compute_div(USARTx_CLK, port->baud); 
+        port->__it_buf = &__buf_usart6;
+        
     } else {
         return USART_UNDEFINED;
     }
@@ -93,44 +97,16 @@ usart_err_t USART_write(USART_port *port, int ch) {
         return USART_OK;
     } else {
         __usart_it_buf *buf;
-        if (port->usart == USART2) {
-            buf = &__buf_usart2; 
-            if (__USART_IT_TX_BUF_LEN(buf) != USART_OK) {
-                return USART_IT_BUF_FULL;
-            }
-            buf->tx_buf[ buf->tx_in & (USART_IT_TX_BUF_SIZE-1) ] = ch;
-            buf->tx_in++;
-            if (buf->tx_restart) {
-                buf->tx_restart = 0;
-                USART2->CR1 |= USART_FLAG_TXE;
-            }
-        } else if (port->usart == USART1) {
-            buf = &__buf_usart1; 
-            if (__USART_IT_TX_BUF_LEN(buf) != USART_OK) {
-                return USART_IT_BUF_FULL;
-            }
-            buf->tx_buf[ buf->tx_in & (USART_IT_TX_BUF_SIZE-1) ] = ch;
-            buf->tx_in++;
-            if (buf->tx_restart) {
-                buf->tx_restart = 0;
-                USART1->CR1 |= USART_FLAG_TXE;
-            }
+        buf = port->__it_buf; 
+        if (__USART_IT_TX_BUF_LEN(buf) != USART_OK) {
+            return USART_IT_BUF_FULL;
         }
-    // only available if USART6 is defined
-    #ifdef USART6
-        else if (port->usart == USART6) {
-            buf = &__buf_usart6; 
-            if (__USART_IT_TX_BUF_LEN(buf) != USART_OK) {
-                return USART_IT_BUF_FULL;
-            }
-            buf->tx_buf[ buf->tx_in & (USART_IT_TX_BUF_SIZE-1) ] = ch;
-            buf->tx_in++;
-            if (buf->tx_restart) {
-                buf->tx_restart = 0;
-                USART6->CR1 |= USART_FLAG_TXE;
-            }
+        buf->tx_buf[ buf->tx_in & (USART_IT_TX_BUF_SIZE-1) ] = ch;
+        buf->tx_in++;
+        if (buf->tx_restart) {
+            buf->tx_restart = 0;
+            USART2->CR1 |= USART_FLAG_TXE;
         }
-    #endif
     }
     return USART_OK;
 }
@@ -149,19 +125,13 @@ uint16_t USART_compute_div(uint32_t periph_clk, uint32_t baud) {
 
 int16_t USART_read(USART_port *port) {
     char ch;
-    if (!port->interrupt_driven) {
-        while(!((port->usart)->SR & USART_SR_RXNE));
-        return (port->usart)->DR;
-    } else {
-        __usart_it_buf *buf;
-        if (port->usart == USART2) {
-            buf = &__buf_usart2; 
-            if ((buf->rx_in - buf->rx_out) == 0) {
-                return (-1);
-            }
-            return (buf->rx_buf[ (buf->rx_out++) & (USART_IT_RX_BUF_SIZE-1) ]);
-        }
+    
+    __usart_it_buf *buf;
+    buf = port->__it_buf; 
+    if ((buf->rx_in - buf->rx_out) == 0) {
+        return (-1);
     }
+    return (buf->rx_buf[ (buf->rx_out++) & (USART_IT_RX_BUF_SIZE-1) ]);
     return ch;
 }
 
@@ -176,22 +146,31 @@ uint8_t USART_getc(USART_port *port) {
 }
 
 
-usart_err_t USART_scan(USART_port *port, char *buf) {
+/**
+ * USART scan functions for inputs.
+ * Stores input into given buffer when input is available.
+ * Limited by the given number of bytes `len`.
+ *
+ *
+ * Make sure that the buffer is big enough to store the number 
+ * of characters in, otherwise the behaviour is undefined.
+ *
+ * @param port USART port
+ * @param buf buffer to store input in
+ * @param len number of bytes(characters) to store in buf
+ *
+ * @return usart_err_t `USART_OK` on success
+ */
+usart_err_t USART_scan(USART_port port, char *buf, int len) {
     volatile int buf_i = 0;
-    if (port->interrupt_driven) {
-        if ( port->usart == USART2) {
-            volatile int c = USART_read(port);
-            while (c != -1) {
-                if (buf_i >= sizeof(buf)) {
-                    return USART_OK;
-                }
-                buf[ buf_i++ ] = c;
-                c = USART_read(port);
-            }
+    int c = USART_read(&port);
+    while (c != -1) {
+        if (buf_i >= len) {
             return USART_OK;
         }
-    } else {
-
+        buf[ buf_i++ ] = c;
+        buf[ buf_i ] = '\0';
+        c = USART_read(&port);
     }
     return USART_OK;
 }
@@ -207,7 +186,7 @@ usart_err_t USART_scan(USART_port *port, char *buf) {
  *
  * @return USART error code (USART_OK on success, USART_IT_BUF_FULL on interrupt buffer overflow)
  */
-usart_err_t USART_printf(USART_port *port, const char *format, ...) {
+usart_err_t USART_printf(USART_port port, const char *format, ...) {
     char buff[USART_CHAR_BUFFER_LEN];
 
     va_list args;
@@ -216,10 +195,10 @@ usart_err_t USART_printf(USART_port *port, const char *format, ...) {
     vsprintf(buff, format, args);    
 
     for (int i = 0; i < strlen(buff); i++) {
-        if ( buff[i] == '\n' && USART_write(port, '\r') != USART_OK) {
+        if ( buff[i] == '\n' && USART_write(&port, '\r') != USART_OK) {
             return USART_IT_BUF_FULL;   
         }
-        if (USART_write(port, buff[i]) != USART_OK) {
+        if (USART_write(&port, buff[i]) != USART_OK) {
             return USART_IT_BUF_FULL;
         }
     }
@@ -228,23 +207,13 @@ usart_err_t USART_printf(USART_port *port, const char *format, ...) {
 }
 
 
-
-usart_err_t USART_input_echo(USART_port *port) {
-    volatile int c;
-    while ((c = USART_getc(port)) != -1) {
-        USART_write(port, c);
-    }
-    return USART_OK;
-}
-
-
-
-bool USART_has_input(USART_port *port) {
-    if ((port->usart)->SR & USART_SR_RXNE) {
+bool USART_available(USART_port port) {
+    if (port.__it_buf->rx_in != port.__it_buf->rx_out) {
         return true;
     }
     return false;
 }
+
 
 
 /**
@@ -326,6 +295,15 @@ void USART1_IRQHandler() {
             USART1->CR1 &= ~USART_FLAG_TXE;
         }
     }
+
+    if (USART1->SR & USART_FLAG_RXNE) {
+        USART1->SR &= ~USART_FLAG_RXNE;
+        buf = &__buf_usart1;
+        if (((buf->rx_in - buf->rx_out) & ~(USART_IT_RX_BUF_SIZE-1)) == 0) {
+            buf->rx_buf[ buf->rx_in & (USART_IT_RX_BUF_SIZE-1) ] = (USART1->DR & 0xFF);
+            buf->rx_in++;
+        }
+    }
 }
 
 /**
@@ -373,6 +351,15 @@ void USART6_IRQHandler() {
         } else {
             buf->tx_restart = true;
             USART6->CR1 &= ~USART_FLAG_TXE;
+        }
+    }
+
+    if (USART6->SR & USART_FLAG_RXNE) {
+        USART6->SR &= ~USART_FLAG_RXNE;
+        buf = &__buf_usart6;
+        if (((buf->rx_in - buf->rx_out) & ~(USART_IT_RX_BUF_SIZE-1)) == 0) {
+            buf->rx_buf[ buf->rx_in & (USART_IT_RX_BUF_SIZE-1) ] = (USART6->DR & 0xFF);
+            buf->rx_in++;
         }
     }
 }
