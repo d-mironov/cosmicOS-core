@@ -90,14 +90,14 @@ usart_err_t USART_init(USART_port *port) {
  *
  * @return Error code (USART_OK on success, USART_IT_BUF_FULL on interrupt buffer overflow)
  */
-usart_err_t USART_write(USART_port *port, int ch) {
-    if (!port->interrupt_driven) {
-        while(!((port->usart)->SR & USART_SR_TXE));
-        (port->usart)->DR = (ch & 0xFF);
+usart_err_t USART_write(USART_port port, int ch) {
+    if (!port.interrupt_driven) {
+        while(!((port.usart)->SR & USART_SR_TXE));
+        (port.usart)->DR = (ch & 0xFF);
         return USART_OK;
     } else {
         __usart_it_buf *buf;
-        buf = port->__it_buf; 
+        buf = port.__it_buf; 
         if (__USART_IT_TX_BUF_LEN(buf) != USART_OK) {
             return USART_IT_BUF_FULL;
         }
@@ -123,11 +123,17 @@ uint16_t USART_compute_div(uint32_t periph_clk, uint32_t baud) {
 }
 
 
-int16_t USART_read(USART_port *port) {
+/**
+ * Interrupt driven USART read function
+ *
+ * @param port USART port
+ * @return -1 if no input, characte read on input
+ */
+int16_t USART_read(USART_port port) {
     char ch;
     
     __usart_it_buf *buf;
-    buf = port->__it_buf; 
+    buf = port.__it_buf; 
     if ((buf->rx_in - buf->rx_out) == 0) {
         return (-1);
     }
@@ -136,7 +142,7 @@ int16_t USART_read(USART_port *port) {
 }
 
 
-uint8_t USART_getc(USART_port *port) {
+uint8_t USART_getc(USART_port port) {
     volatile int ch;
     do {
         ch = USART_read(port);
@@ -163,14 +169,14 @@ uint8_t USART_getc(USART_port *port) {
  */
 usart_err_t USART_scan(USART_port port, char *buf, int len) {
     volatile int buf_i = 0;
-    int c = USART_read(&port);
+    int c = USART_read(port);
     while (c != -1) {
         if (buf_i >= len) {
             return USART_OK;
         }
         buf[ buf_i++ ] = c;
         buf[ buf_i ] = '\0';
-        c = USART_read(&port);
+        c = USART_read(port);
     }
     return USART_OK;
 }
@@ -195,10 +201,10 @@ usart_err_t USART_printf(USART_port port, const char *format, ...) {
     vsprintf(buff, format, args);    
 
     for (int i = 0; i < strlen(buff); i++) {
-        if ( buff[i] == '\n' && USART_write(&port, '\r') != USART_OK) {
+        if ( buff[i] == '\n' && USART_write(port, '\r') != USART_OK) {
             return USART_IT_BUF_FULL;   
         }
-        if (USART_write(&port, buff[i]) != USART_OK) {
+        if (USART_write(port, buff[i]) != USART_OK) {
             return USART_IT_BUF_FULL;
         }
     }

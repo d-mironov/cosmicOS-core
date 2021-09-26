@@ -1,5 +1,9 @@
-/* cosmicOS usart.h - USART HAL
- * @author: SL7
+/*
+ * cosmicOS usart.h - USART HAL
+ *
+ * @author:     cosmicfennek
+ * @version:    v2.1
+ *
  * ├ ╰ ─ │
  * Changelog v2:
  *   ├── v2.1
@@ -16,7 +20,7 @@
  * TODO: [x] implement interrupt driven write 
  * TODO: [x] implement interrupt driven read 
  * TODO: [x] fix interrupt read string fracturing error
- * TODO: [ ] write interrupt for all other USART ports
+ * TODO: [x] write interrupt for all other USART ports
  * TODO: [ ] write docs
  */
 
@@ -199,16 +203,14 @@ uint16_t USART_compute_div(uint32_t periph_clk, uint32_t baud);
 
 usart_err_t USART_init(USART_port *port);
 
-usart_err_t USART_write(USART_port *port, int ch);
+usart_err_t USART_write(USART_port port, int ch);
 usart_err_t USART_printf(USART_port port, const char *format, ...);
 
-int16_t USART_read(USART_port *port);
-uint8_t USART_getc(USART_port *port);
+int16_t USART_read(USART_port port);
+uint8_t USART_getc(USART_port port);
 usart_err_t USART_scan(USART_port port, char *buf, int len);
 usart_err_t USART_input_echo(USART_port *port);
 bool USART_available(USART_port port);
-
-bool USART_has_input(USART_port *port);
 
 void USART_interrupt_enable(USART_port *port);
 void USART_interrupt_disable(USART_port *port);

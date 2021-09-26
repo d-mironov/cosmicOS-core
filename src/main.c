@@ -3,8 +3,7 @@
 #include "stm32/f4/gpio/gpio.h"
 #include "stm32/f4/delay/delay.h"
 #include "stm32/f4/uart/uart.h"
-#include "stm32/f4/twowire/twowire.h"
-#include "bitutils.h"
+#include "stm32/f4/twowire/twowire.h" #include "bitutils.h"
 //#include "stm32/f4/rcc/rcc.h"
 //#include "stm32/f4/exti/exti.h"
 
@@ -54,7 +53,7 @@ int main(void) {
     //I2C_write_burst(&i2c1, MPU_ADDR, 0x6B, 1, init); 
     //const clock_t *test = &RCC_25MHZ_TO_84MHZ;
     char usart_test[255] = {0};
-    long int cycle = 0; 
+    unsigned long int cycle = 0; 
     uint8_t bit_test = 0;
     //setbit(bit_test, 4);
     //USART_printf(&port, "Test bitutils: %d\n", bit_test);
@@ -69,14 +68,13 @@ int main(void) {
         //char ch = USART_getc(&port);
         //USART_printf(&port, "getc: %c\n", ch);
         //USART_scan(port, usart_test, 255);
-        USART_printf(port, "%s\n", usart_test);
+        if (USART_available(port)) {
+            USART_scan(port, usart_test, 255);
+            USART_printf(port, "%s\n", usart_test);
+        }
         if (USART_printf(port, "Cycle: %d\n", cycle++) != USART_OK) {
             USART_printf(port, "[x] printing did not work\n");
         }
-        if (USART_available(port)) {
-            USART_printf(port, "[+] USART2 input available\n");
-        }
-        USART_scan(port, usart_test, 255);
 
             //GPIO_toggle(PA8);
         //USART_printf(&port, "%c", USART_read(&port));
