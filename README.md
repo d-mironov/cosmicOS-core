@@ -13,7 +13,7 @@ More coming soon...
 - [x] GPIO
 - [x] EXTI interrupts
 - [x] USART
-- [-] I2C
+- [ ] I2C (work in progress)
 - [ ] SPI
 - [ ] DMA
 - [ ] USB-OTG
@@ -21,9 +21,6 @@ More coming soon...
 - [ ] SMBus
 - [ ] Timers
 more features coming soon...
-
-`x` : finished and working  
-`-` : work in progress  
 
 ## Contact
 Hit me up on [sl7@flate.io](mailto:sl7@flate.io).
