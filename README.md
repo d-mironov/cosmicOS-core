@@ -1,7 +1,7 @@
 # cosmicOS-core
 
 This is a simple to use HAL for ARM Cortex-M based MCUs  
-IT'S A **WORK IN PROGRESS** SO STAY TUNED
+IT'S A **WORK IN PROGRESS** SO STAY TUNED  
 More coming soon...
 
 ## Supported Platforms
