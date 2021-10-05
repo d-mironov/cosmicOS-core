@@ -1,0 +1,4 @@
+2021-09-27 Make general notes on interrupt I2C due:2021-09-27
+(A) 2021-10-04 finish error handling due:2021-10-04
+(A) 2021-10-04 finish error handling on read due:2021-10-04
+(A) 2021-10-04 finish error handling on write due:2021-10-04

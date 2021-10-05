@@ -141,7 +141,7 @@ typedef struct __usart_interrupt_buffer {
     uint32_t rx_in;                     /*!< RX buffer index in     */
     uint32_t rx_out;                    /*!< RX buffer index out    */
     bool tx_restart;                    /*!< restart TX buffer      */
-} __usart_it_buf;
+} __usart_it_handle;
 
 /**
  * @brief USART port settings structure
@@ -149,7 +149,7 @@ typedef struct __usart_interrupt_buffer {
  */
 typedef struct _USART_port {
     USART_TypeDef *usart;           /*!< USART port */
-    __usart_it_buf *__it_buf;
+    __usart_it_handle *__it_buf;
     uint32_t baud;                  /*!< USART baud rate */
     uint32_t mode;                  /*!< USART mode */
     uint32_t stop_bits;             /*!< USART stop bit setting */
@@ -164,13 +164,13 @@ typedef struct _USART_port {
  */
 typedef enum usart_err {
     USART_OK,               /*!< USART function success */
-    USART_UNDEFINED,        /*!< USART port undefined (NULL) */
-    USART_IT_BUF_FULL,      /*!< USART full interrupt mode buffer */
-    USART_RX_EMPTY,
+    USART_ERR_UNDEFINED,        /*!< USART port undefined (NULL) */
+    USART_ERR_IT_BUF_FULL,      /*!< USART full interrupt mode buffer */
+    USART_ERR_RX_EMPTY,
 } usart_err_t;
 
 
-static __usart_it_buf __buf_usart1 = {
+static __usart_it_handle __buf_usart1 = {
     .rx_in = 0,
     .rx_out = 0,
     .tx_in = 0,
@@ -178,7 +178,7 @@ static __usart_it_buf __buf_usart1 = {
     .tx_restart = true
 };
 
-static __usart_it_buf __buf_usart2 = {
+static __usart_it_handle __buf_usart2 = {
     .rx_in = 0,
     .rx_out = 0,
     .tx_in= 0,
@@ -186,7 +186,7 @@ static __usart_it_buf __buf_usart2 = {
     .tx_restart = true
 };
 
-static __usart_it_buf __buf_usart6 = {
+static __usart_it_handle __buf_usart6 = {
     .rx_in = 0,
     .rx_out = 0,
     .tx_in = 0,
@@ -229,8 +229,8 @@ void USART_DMA_disable(USART_port *port);
 
 void USART_disable(USART_port *port);
 
-usart_err_t __USART_IT_TX_BUF_LEN(__usart_it_buf *buf);
-usart_err_t __USART_IT_RX_BUF_LEN(__usart_it_buf *buf);
+usart_err_t __USART_IT_TX_BUF_LEN(__usart_it_handle *buf);
+usart_err_t __USART_IT_RX_BUF_LEN(__usart_it_handle *buf);
 
 
 #endif
