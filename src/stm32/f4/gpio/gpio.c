@@ -96,8 +96,8 @@ gpio_err_t GPIO_select_alternate(const gpio_pin_t pin, const uint8_t af) {
         port->AFR[0] &= ~(15 << (raw_pin * 4));
         port->AFR[0] |= (af << (raw_pin * 4));
     } else {
-        port->AFR[1] &= ~(15 << (raw_pin * 4));
-        port->AFR[1] |= (af << (raw_pin * 4));
+        port->AFR[1] &= ~(15 << ((raw_pin-8) * 4));
+        port->AFR[1] |= (af << ((raw_pin-8) * 4));
     }
 
     return GPIO_OK;

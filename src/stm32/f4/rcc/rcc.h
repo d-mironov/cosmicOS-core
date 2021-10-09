@@ -145,18 +145,18 @@ typedef enum rcc_clock_port {
 static const clock_t rcc_hse_25_mhz_to_84_mhz = {
     .hse_clock = 25000000,
     .pll_source = PLL_SRC_HSE,
-    .pll_m = 25,
-    .pll_n = 336,
-    .pll_p = RCC_PLL_P_4,
-    .pll_q = RCC_PLL_Q_7,
+    .pll_m = 16,
+    .pll_n = 128,
+    .pll_p = RCC_PLL_P_2,
+    .pll_q = RCC_PLL_Q_4,
     .ahb_pre = RCC_AHB_NODIV,
     .apb1_pre = RCC_APB1_DIV_2,
     .apb2_pre = RCC_APB2_NODIV,
     .sysclk_source = SYSCLK_PLL,
-    .ahb_freq = 84000000,
-    .apb1_freq = 42000000,
-    .apb2_freq = 84000000,
-    .usb_swio_freq = 48000000
+    .ahb_freq = 100000000,
+    .apb1_freq = 50000000,
+    .apb2_freq = 100000000,
+    .usb_swio_freq = 0
 };
 
 

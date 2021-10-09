@@ -106,11 +106,15 @@ typedef struct _I2C_port {
 } I2C_port;
 
 
+// init
 i2c_err_t I2C_init(I2C_port *port);
+//read
 i2c_err_t I2C_read(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t *data);
 i2c_err_t I2C_read_burst(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t n, uint8_t *data);
+//write
 i2c_err_t I2C_write(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t data);
 i2c_err_t I2C_write_burst(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t n, uint8_t *data);
+//errors
 i2c_err_t I2C_get_err(I2C_port port);
 char*     I2C_get_err_str(i2c_err_t err);
 i2c_err_t I2C_handle_err(I2C_port port, i2c_err_t err);

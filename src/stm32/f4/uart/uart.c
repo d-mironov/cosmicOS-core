@@ -65,7 +65,7 @@ usart_err_t USART_init(USART_port *port) {
     if (port->interrupt_driven) {
         USART_interrupt_enable(port);
         if ((port->mode & USART_CHECK_RX_MODE) != 0) {
-            USART2->CR1 |= USART_RXNE_IE;
+            (port->usart)->CR1 |= USART_RXNE_IE;
         }
     }
      
@@ -105,7 +105,7 @@ usart_err_t USART_write(USART_port port, int ch) {
         buf->tx_in++;
         if (buf->tx_restart) {
             buf->tx_restart = 0;
-            USART2->CR1 |= USART_FLAG_TXE;
+            (port.usart)->CR1 |= USART_FLAG_TXE;
         }
     }
     return USART_OK;
@@ -304,6 +304,7 @@ void USART1_IRQHandler() {
 
     if (USART1->SR & USART_FLAG_RXNE) {
         USART1->SR &= ~USART_FLAG_RXNE;
+        GPIO_write(PA8, GPIO_ON);
         buf = &__buf_usart1;
         if (((buf->rx_in - buf->rx_out) & ~(USART_IT_RX_BUF_SIZE-1)) == 0) {
             buf->rx_buf[ buf->rx_in & (USART_IT_RX_BUF_SIZE-1) ] = (USART1->DR & 0xFF);

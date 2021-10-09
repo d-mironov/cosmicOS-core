@@ -34,7 +34,8 @@
 #include <stdbool.h>
 
 #define USART2_CLK  16000000
-#define USARTx_CLK  50000000
+//#define USARTx_CLK  50000000
+#define USARTx_CLK  16000000
 
 
 #define USART1_PORT     GPIOA

@@ -97,6 +97,12 @@
 #define GYRO_CONF_OFFSET    0x03
 #define ACCEL_CONF_OFFSET   0x03
 
+#define MPU_NUM_CALIBRATIONS    (100)
+#define MPU_MAX_ERRORS          (0x0A)
+
+static int16_t mpu_gyro_calib[3];
+static int16_t mpu_accel_calib[3];
+
 /**
  * Gyroscope range in deg/s
  */
@@ -119,7 +125,8 @@ typedef enum _mpu_accel_range_t {
 
 typedef enum _mpu_err_t {
     MPU_OK,
-    MPU_I2C_FAILED,
+    MPU_ERR_I2C_FAILED,
+    MPU_ERR_ARR_SIZE,
 } mpu_err_t;
 
 
@@ -136,16 +143,31 @@ typedef struct _mpu_t {
 mpu_err_t MPU_init(mpu_t *mpu);
 mpu_err_t MPU_set_gyro_range(mpu_t *mpu);
 mpu_err_t MPU_set_accel_range(mpu_t *mpu);
+mpu_err_t MPU_calibrate(mpu_t mpu);
+float     MPU_get_gyro_range(mpu_t mpu);
+int32_t  MPU_get_accel_range(mpu_t mpu);
 
 // RAW Gyroscope measurements
-int16_t MPU_gyro_x_raw(mpu_t *mpu);
-int16_t MPU_gyro_y_raw(mpu_t *mpu);
-int16_t MPU_gyro_z_raw(mpu_t *mpu);
+mpu_err_t MPU_gyro_x_raw(mpu_t mpu, int32_t *data);
+mpu_err_t MPU_gyro_y_raw(mpu_t mpu, int32_t *data);
+mpu_err_t MPU_gyro_z_raw(mpu_t mpu, int32_t *data);
+mpu_err_t MPU_gyro_raw(mpu_t mpu, int32_t *data);
 
 // RAW Accelerometer measurements
-int16_t MPU_accel_x_raw(mpu_t *mpu);
-int16_t MPU_accel_y_raw(mpu_t *mpu);
-int16_t MPU_accel_z_raw(mpu_t *mpu);
+mpu_err_t MPU_accel_x_raw(mpu_t mpu, int32_t *data);
+mpu_err_t MPU_accel_y_raw(mpu_t mpu, int32_t *data);
+mpu_err_t MPU_accel_z_raw(mpu_t mpu, int32_t *data);
+mpu_err_t MPU_accel_raw(mpu_t mpu, int32_t *data);
 
+mpu_err_t MPU_gyro_x(mpu_t mpu, float *data);
+mpu_err_t MPU_gyro_y(mpu_t mpu, float *data);
+mpu_err_t MPU_gyro_z(mpu_t mpu, float *data);
+mpu_err_t MPU_gyro(mpu_t mpu, float *data, int32_t n);
+
+mpu_err_t MPU_accel_x(mpu_t mpu, float *data);
+mpu_err_t MPU_accel_y(mpu_t mpu, float *data);
+mpu_err_t MPU_accel_z(mpu_t mpu, float *data);
+mpu_err_t MPU_accel(mpu_t mpu, float *data, int32_t n);
+// 
 
 #endif
