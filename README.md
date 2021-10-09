@@ -13,7 +13,7 @@ More coming soon...
 - [x] GPIO
 - [x] EXTI interrupts
 - [x] USART
-- [ ] I2C (work in progress)
+- [x] I2C -> interrupt todo
 - [ ] SPI
 - [ ] DMA
 - [ ] USB-OTG
