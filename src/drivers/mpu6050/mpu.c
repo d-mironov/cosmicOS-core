@@ -56,6 +56,7 @@ mpu_err_t MPU_gyro_x_raw(mpu_t mpu, int32_t *data) {
         return MPU_ERR_I2C_FAILED;
     }
     *data = (int16_t)((out[0] << 8) | out[1]);
+    delayMs(2);
     return MPU_OK; 
 }
 
@@ -68,6 +69,7 @@ mpu_err_t MPU_gyro_y_raw(mpu_t mpu, int32_t *data) {
         return MPU_ERR_I2C_FAILED;
     }
     *data = (int16_t)((out[0] << 8) | out[1]);
+    delayMs(2);
     return MPU_OK; 
 }
 
@@ -80,6 +82,7 @@ mpu_err_t MPU_gyro_z_raw(mpu_t mpu, int32_t *data) {
         return MPU_ERR_I2C_FAILED;
     }
     *data = (int16_t)((out[0] << 8) | out[1]);
+    delayMs(2);
     return MPU_OK; 
 }
 
@@ -97,6 +100,7 @@ mpu_err_t MPU_gyro_raw(mpu_t mpu, int32_t *data) {
     if (err != MPU_OK) {
         return err;
     }
+    delayMs(2);
     return MPU_OK;
 }
 
@@ -110,6 +114,7 @@ mpu_err_t MPU_accel_x_raw(mpu_t mpu, int32_t *data) {
         return MPU_ERR_I2C_FAILED;
     }
     *data = (int16_t)((out[0] << 8) | out[1]);
+    delayMs(2);
     return MPU_OK;
 }
 
@@ -122,6 +127,7 @@ mpu_err_t MPU_accel_y_raw(mpu_t mpu, int32_t *data) {
         return MPU_ERR_I2C_FAILED;
     }
     *data = (int16_t)((out[0] << 8) | out[1]);
+    delayMs(2);
     return MPU_OK;
 }
 
@@ -134,6 +140,7 @@ mpu_err_t MPU_accel_z_raw(mpu_t mpu, int32_t *data) {
         return MPU_ERR_I2C_FAILED;
     }
     *data = (int16_t)((out[0] << 8) | out[1]);
+    delayMs(2);
     return MPU_OK;
 }
 
@@ -151,6 +158,7 @@ mpu_err_t MPU_accel_raw(mpu_t mpu, int32_t *data) {
     if (err != MPU_OK) {
         return err;
     }
+    delayMs(2);
     return MPU_OK;
 }
 

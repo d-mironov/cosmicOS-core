@@ -6,6 +6,7 @@
 #include <core_cm4.h>
 
 #include "../gpio/gpio.h"
+#include "../rcc/rcc.h"
 
 
 /**
@@ -30,7 +31,7 @@ usart_err_t USART_init(USART_port *port) {
         GPIO_select_alternate(USART1_RX, GPIO_AF07);
         GPIO_select_alternate(USART1_TX, GPIO_AF07);
         RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-        (port->usart)->BRR = USART_compute_div(USARTx_CLK, port->baud); 
+        (port->usart)->BRR = USART_compute_div(apb2_freq, port->baud); 
         port->__it_buf = &__buf_usart1;
     } else if (port->usart == USART2) {
         //RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
@@ -39,7 +40,7 @@ usart_err_t USART_init(USART_port *port) {
         GPIO_select_alternate(USART2_RX, GPIO_AF07);
         GPIO_select_alternate(USART2_TX, GPIO_AF07);
         RCC->APB1ENR |= RCC_APB1ENR_USART2EN;
-        (port->usart)->BRR = USART_compute_div(USART2_CLK, port->baud); 
+        (port->usart)->BRR = USART_compute_div(apb1_freq, port->baud); 
         port->__it_buf = &__buf_usart2;
     } else if (port->usart == USART6) {
         //RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
@@ -48,7 +49,7 @@ usart_err_t USART_init(USART_port *port) {
         GPIO_select_alternate(USART6_RX, GPIO_AF07);
         GPIO_select_alternate(USART6_TX, GPIO_AF07);
         RCC->APB2ENR |= RCC_APB2ENR_USART6EN;
-        (port->usart)->BRR = USART_compute_div(USARTx_CLK, port->baud); 
+        (port->usart)->BRR = USART_compute_div(apb2_freq, port->baud); 
         port->__it_buf = &__buf_usart6;
         
     } else {
@@ -304,7 +305,7 @@ void USART1_IRQHandler() {
 
     if (USART1->SR & USART_FLAG_RXNE) {
         USART1->SR &= ~USART_FLAG_RXNE;
-        GPIO_write(PA8, GPIO_ON);
+        //GPIO_write(PA8, GPIO_ON);
         buf = &__buf_usart1;
         if (((buf->rx_in - buf->rx_out) & ~(USART_IT_RX_BUF_SIZE-1)) == 0) {
             buf->rx_buf[ buf->rx_in & (USART_IT_RX_BUF_SIZE-1) ] = (USART1->DR & 0xFF);

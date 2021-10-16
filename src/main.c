@@ -6,7 +6,7 @@
 #include "stm32/f4/i2c/i2c.h" 
 #include "drivers/mpu6050/mpu.h"
 #include "bitutils.h"
-//#include "stm32/f4/rcc/rcc.h"
+#include "stm32/f4/rcc/rcc.h"
 //#include "stm32/f4/exti/exti.h"
 
 #define MPU_ADDR    0x68
@@ -32,6 +32,9 @@ uint16_t read_x(I2C_port port, USART_port usart) {
 
 
 int main(void) {
+
+    //RCC_system_clock_config(rcc_hse_25_mhz_to_96_mhz);   
+
     I2C_port i2c1 = {
         .i2c = I2C1,
         .frequency = 16,
@@ -49,15 +52,15 @@ int main(void) {
         .interrupt_driven = true,
     };
 
-    USART_port gps = {
-        .usart = USART1,
-        .baud = 9600,
-        .mode = USART_RX_MODE,
-        .interrupt_driven = true,
-        .stop_bits = 0,
-        .parity_enable = 0,
-        .parity_even_odd = 0,
-    };
+    //USART_port gps = {
+    //    .usart = USART1,
+    //    .baud = 9600,
+    //    .mode = USART_RX_MODE,
+    //    .interrupt_driven = true,
+    //    .stop_bits = 0,
+    //    .parity_enable = 0,
+    //    .parity_even_odd = 0,
+    //};
 
     mpu_t mpu = {
         .accel_range = ACCEL_4G,
@@ -68,7 +71,7 @@ int main(void) {
     GPIO_enable(PA8, GPIO_OUTPUT);
     
     USART_init(&port);   
-    USART_init(&gps);
+    //USART_init(&gps);
     mpu_err_t mpu_err;
     mpu_err = MPU_init(&mpu);
     USART_printf(port, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -91,7 +94,7 @@ int main(void) {
     unsigned long int cycle = 0; 
     uint8_t bit_test = 0;
     usart_err_t usart_err;
-
+    USART_printf(port, "APB2 clock: %d\n", ahb_freq);
     while (1) {
         GPIO_toggle(DEBUG_LED);
                 
@@ -103,8 +106,8 @@ int main(void) {
         //    USART_printf(port, "%s\n", usart_test);
         //}
         //USART_printf(gps, "Hello USART\n");
-        USART_scan(gps, usart_test, 512);
-        USART_printf(port, "%s\n", usart_test);
+        //USART_scan(gps, usart_test, 512);
+        //USART_printf(port, "%s\n", usart_test);
 
         //if (USART_printf(port, "Cycle: %d\n", cycle++) != USART_OK) {
         //    USART_printf(port, "[x] printing did not work\n");
@@ -131,12 +134,15 @@ int main(void) {
         if (mpu_err != MPU_OK) {
             USART_printf(port, "[x] Gyroscope reading failed\n");
         }
+        //delayMs(2);
         mpu_err = MPU_accel(mpu, accel, 3);
         if (mpu_err != MPU_OK) {
             USART_printf(port, "[x] Accelerometer reading failed\n");
         }
-        //USART_printf(port, "Gyro ->  X: % -9.3f  Y: % -9.3f  Z: % -9.3f    Accel ->  X: % -9.3f  Y: % -9.3f  Z: % -9.3f\r", gyro[0], gyro[1], gyro[2], accel[0], accel[1], accel[2]);
-
+        //MPU_calibrate(mpu);
+        if (mpu_err == MPU_OK) {
+            USART_printf(port, "Gyro ->  X: % -9.3f  Y: % -9.3f  Z: % -9.3f    Accel ->  X: % -9.3f  Y: % -9.3f  Z: % -9.3f\r", gyro[0], gyro[1], gyro[2], accel[0], accel[1], accel[2]);
+        }
         //int32_t accel_raw[3];
         //mpu_err = MPU_accel_raw(mpu, accel_raw);
         //if (mpu_err != MPU_OK) {

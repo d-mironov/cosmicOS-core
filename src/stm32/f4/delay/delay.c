@@ -1,8 +1,9 @@
 #include "delay.h"
 #include <stm32f4xx.h>
+#include "../rcc/rcc.h"
 
 void delayMs(uint32_t ms) {
-    SysTick->LOAD = CYCLES_MS;
+    SysTick->LOAD = (ahb_freq/1000);
     SysTick->VAL = 0x00;
 
     SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
@@ -15,7 +16,7 @@ void delayMs(uint32_t ms) {
 
 
 void delayUs(uint32_t us) {
-    SysTick->LOAD = CYCLES_MS/1000;
+    SysTick->LOAD = (ahb_freq/1000)/1000;
     SysTick->VAL = 0x00;
 
     SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;

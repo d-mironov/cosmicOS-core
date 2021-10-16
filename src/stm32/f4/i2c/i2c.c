@@ -443,3 +443,10 @@ char *I2C_get_err_str(i2c_err_t err) {
             return "[I2C] Ok!";
     }
 }
+
+
+i2c_err_t I2C_handle_err(I2C_port port, i2c_err_t err) {
+
+
+    return I2C_OK;
+}

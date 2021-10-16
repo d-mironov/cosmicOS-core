@@ -2,8 +2,9 @@
 #define _SYSTICK_DELAY_H
 
 #include <stdint.h>
+#include "../rcc/rcc.h"
 
-#define CYCLES_MS   16000
+//#define CYCLES_MS   (rcc_active_clock.ahb_freq / 1000)
 
 #define CTRL_ENABLE         (1U<<0)
 #define CTRL_CLKSRC         (1U<<2)
@@ -11,5 +12,6 @@
 
 void delayMs(uint32_t ms);
 void delayMs(uint32_t us);
+
 
 #endif
