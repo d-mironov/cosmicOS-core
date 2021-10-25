@@ -10,7 +10,9 @@
  * |       |___ added byte read function (tested)
  * |       |___ added burst byte read function
  * |       |___ added burst write function
- * |       
+ * |
+ * |_____v0.2       
+ * |       |___ added timout on `BUSY` flag
  *
  * @author: cosmicraccoon (aka Daniel Mironow)
  * @version: v0.1
@@ -86,6 +88,7 @@ typedef enum _i2c_err_h {
     I2C_ERR_SMBALERT,
     I2C_ERR_PORT_UNDEFINED,
     I2C_ERR_NOT_CONFIGURED,
+    I2C_ERR_BUS_TIMEOUT,
 } i2c_err_t;
 
 typedef struct __twowire_it_handle {
@@ -99,6 +102,7 @@ typedef struct _I2C_port {
     uint8_t frequency;
     uint8_t mode;
     uint8_t duty;
+    uint8_t timeout;
     bool _set_up;
     bool interrupt_driven;
     bool slave;

@@ -2,6 +2,7 @@
 #include "../gpio/gpio.h"
 #include <stm32f4xx.h>
 #include <stdbool.h>
+#include "../delay/delay.h"
 
 
 /**
@@ -49,6 +50,10 @@ i2c_err_t I2C_init(I2C_port *port) {
         return I2C_ERR_FREQ_TOO_LOW; 
     } else if (port->frequency > I2C_FREQ_MAX) {
         return I2C_ERR_FREQ_TOO_HIGH;
+    }
+
+    if (port->timeout == 0) {
+        port->timeout = 100;
     }
 
     // Reset CRx, CCR and TRISE
@@ -151,11 +156,27 @@ i2c_err_t I2C_read(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t *data)
     volatile int tmp;
     uint8_t out;
     i2c_err_t err;
-    while((port.i2c)->SR2 & I2C_SR2_BUSY) {
+    // TODO: fix infinite loop on wrong device
+    //GPIO_write(PA8, GPIO_ON);
+    SysTick->LOAD = (apb1_freq/1000);
+    SysTick->VAL = 0x00;
+    SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
+
+    for(uint32_t i = 0; i < port.timeout && (port.i2c)->SR2 & I2C_SR2_BUSY; i++) {
+        while((SysTick->CTRL & CTRL_COUNTFLAG) == 0);
         if ((err = I2C_get_err(port)) != I2C_OK) {
             return err;
         }
+        if (i == port.timeout - 1) {
+            return I2C_ERR_BUS_TIMEOUT;
+        }
     }
+    SysTick->CTRL = 0x00;
+    //while((port.i2c)->SR2 & I2C_SR2_BUSY) {
+    //    if ((err = I2C_get_err(port)) != I2C_OK) {
+    //        return err;
+    //    }
+    //}
     // Generate start condition
     if ((err = _I2C_send_start(port)) != I2C_OK) {
         return err;
@@ -186,6 +207,7 @@ i2c_err_t I2C_read(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t *data)
     (port.i2c)->CR1 |= I2C_CR1_STOP;
     // check for RXNE flag
     while(!((port.i2c)->SR1 & I2C_SR1_RXNE));
+    //GPIO_write(PA8, GPIO_ON);
     *data = (port.i2c)->DR;
     return I2C_OK;
 }
@@ -210,11 +232,27 @@ i2c_err_t I2C_read_burst(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t 
     volatile int tmp;
     i2c_err_t err;
     volatile uint8_t reg = memaddr;
-    while((port.i2c)->SR2 & I2C_SR2_BUSY) {
+    //while((port.i2c)->SR2 & I2C_SR2_BUSY) {
+    //    if ((err = I2C_get_err(port)) != I2C_OK) {
+    //        return err;
+    //    }
+    //}
+
+    // Timeout for bus busy
+    SysTick->LOAD = (apb1_freq/1000);
+    SysTick->VAL = 0x00;
+    SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
+    for(uint32_t i = 0; i < port.timeout && (port.i2c)->SR2 & I2C_SR2_BUSY; i++) {
+        while((SysTick->CTRL & CTRL_COUNTFLAG) == 0);
         if ((err = I2C_get_err(port)) != I2C_OK) {
             return err;
         }
+        if (i == port.timeout - 1) {
+            return I2C_ERR_BUS_TIMEOUT;
+        }
     }
+    SysTick->CTRL = 0x00;
+
     // GENERATE START CONDITION
     if ((err = _I2C_send_start(port)) != I2C_OK) {
         return err; 
@@ -289,11 +327,29 @@ i2c_err_t I2C_write_burst(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t
     }
     volatile int tmp;
     i2c_err_t err;
-    while((port.i2c)->SR2 & I2C_SR2_BUSY) {
+
+
+    // Timeout for bus busy
+    SysTick->LOAD = (apb1_freq/1000);
+    SysTick->VAL = 0x00;
+    SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
+    for(uint32_t i = 0; i < port.timeout && (port.i2c)->SR2 & I2C_SR2_BUSY; i++) {
+        while((SysTick->CTRL & CTRL_COUNTFLAG) == 0);
         if ((err = I2C_get_err(port)) != I2C_OK) {
             return err;
         }
+        if (i == port.timeout - 1) {
+            return I2C_ERR_BUS_TIMEOUT;
+        }
     }
+    SysTick->CTRL = 0x00;
+
+
+    //while((port.i2c)->SR2 & I2C_SR2_BUSY) {
+    //    if ((err = I2C_get_err(port)) != I2C_OK) {
+    //        return err;
+    //    }
+    //}
     if ((err = _I2C_send_start(port)) != I2C_OK) {
         return err;
     }
@@ -326,6 +382,24 @@ i2c_err_t I2C_write(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t data)
     }
     volatile int tmp;
     i2c_err_t err;
+
+
+    // Timeout for bus busy
+    SysTick->LOAD = (apb1_freq/1000);
+    SysTick->VAL = 0x00;
+    SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
+    for(uint32_t i = 0; i < port.timeout && (port.i2c)->SR2 & I2C_SR2_BUSY; i++) {
+        while((SysTick->CTRL & CTRL_COUNTFLAG) == 0);
+        if ((err = I2C_get_err(port)) != I2C_OK) {
+            return err;
+        }
+        if (i == port.timeout - 1) {
+            return I2C_ERR_BUS_TIMEOUT;
+        }
+    }
+    SysTick->CTRL = 0x00;
+
+
     while((port.i2c)->SR2 & I2C_SR2_BUSY) {
         if ((err = I2C_get_err(port)) != I2C_OK) {
             return err;
@@ -351,7 +425,8 @@ i2c_err_t I2C_write(I2C_port port, uint8_t slave, uint8_t memaddr, uint8_t data)
     (port.i2c)->DR = data;
     while(!((port.i2c)->SR1 & I2C_SR1_BTF));
     (port.i2c)->CR1 |= I2C_CR1_STOP; 
-    
+     
+    delayMs(1);
     return I2C_OK;
 }
 
@@ -413,32 +488,39 @@ i2c_err_t _I2C_send_data(I2C_port port, uint8_t data) {
     return I2C_OK;
 }
 
+i2c_err_t _I2C_send_stop(I2C_port port) { 
+    (port.i2c)->CR1 |= I2C_CR1_STOP; 
+    return I2C_OK;
+}
+
 char *I2C_get_err_str(i2c_err_t err) {
     switch (err) {
         case I2C_ERR_AF:
-            return "[I2C] acknowledge failure";
+            return "acknowledge failure";
         case I2C_ERR_BUS:
-            return "[I2C] bus error";
+            return "bus error";
         case I2C_ERR_OVR:
-            return "[I2C] overrun error";
+            return "overrun error";
         case I2C_ERR_PEC:
-            return "[I2C] PEC error";
+            return "PEC error";
         case I2C_ERR_ARBLOSS:
-            return "[I2C] arbitration loss";
+            return "arbitration loss";
         case I2C_ERR_TIMEOUT:
             return "[SMBus] timeout";
         case I2C_ERR_SMBALERT:
             return "[SMBus] SMBus alert";
         case I2C_ERR_FREQ_TOO_LOW:
-            return "[I2C] set frequency too low";
+            return "set frequency too low";
         case I2C_ERR_FREQ_TOO_HIGH:
-            return "[I2C] set frequency too high";
+            return "set frequency too high";
         case I2C_ERR_NOT_CONFIGURED:
-            return "[I2C] port not set up: call `I2C_init()`";
+            return "port not set up: call `I2C_init()`";
         case I2C_ERR_PORT_UNDEFINED:
-            return "[I2C] port unavailable for this MCU or undefined";
+            return "port unavailable for this MCU or undefined";
         case I2C_ERR_PORT_NOT_AVAILABLE:
-            return "[I2C] port not available";
+            return "port not available";
+        case I2C_ERR_BUS_TIMEOUT:
+            return "bus busy -> timeout";
         default:
             return "[I2C] Ok!";
     }
@@ -450,3 +532,5 @@ i2c_err_t I2C_handle_err(I2C_port port, i2c_err_t err) {
 
     return I2C_OK;
 }
+
+

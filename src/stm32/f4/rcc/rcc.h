@@ -110,7 +110,7 @@ typedef enum {
 } rcc_osc_t;
 
 typedef enum {
-    RCC_APB1_NODIV  = 0x00,     
+    RCC_APB1_NODIV  = (0x00),     
     RCC_APB1_DIV_2  = (0x04 << RCC_PPRE1_OFFSET),     
     RCC_APB1_DIV_4  = (0x05 << RCC_PPRE1_OFFSET),     
     RCC_APB1_DIV_8  = (0x06 << RCC_PPRE1_OFFSET),     
@@ -118,7 +118,7 @@ typedef enum {
 } rcc_apb1_pre_t;
 
 typedef enum {
-    RCC_APB2_NODIV  = 0x00,     
+    RCC_APB2_NODIV  = (0x00),     
     RCC_APB2_DIV_2  = (0x04 << RCC_PPRE2_OFFSET),     
     RCC_APB2_DIV_4  = (0x05 << RCC_PPRE2_OFFSET),     
     RCC_APB2_DIV_8  = (0x06 << RCC_PPRE2_OFFSET),     
@@ -126,15 +126,15 @@ typedef enum {
 } rcc_apb2_pre_t;
 
 typedef enum {
-    RCC_AHB_NODIV   =(0x00 << RCC_HPRE_OFFSET),   
-    RCC_AHB_DIV_2   =(0x08 << RCC_HPRE_OFFSET),
-    RCC_AHB_DIV_4   =(0x09 << RCC_HPRE_OFFSET),
-    RCC_AHB_DIV_8   =(0x0A << RCC_HPRE_OFFSET),
-    RCC_AHB_DIV_16  =(0x0B << RCC_HPRE_OFFSET),
-    RCC_AHB_DIV_64  =(0x0C << RCC_HPRE_OFFSET),
-    RCC_AHB_DIV_128 =(0x0D << RCC_HPRE_OFFSET),
-    RCC_AHB_DIV_256 =(0x0E << RCC_HPRE_OFFSET),
-    RCC_AHB_DIV_512 =(0x0F << RCC_HPRE_OFFSET),
+    RCC_AHB_NODIV   = (0x00 << RCC_HPRE_OFFSET),   
+    RCC_AHB_DIV_2   = (0x08 << RCC_HPRE_OFFSET),
+    RCC_AHB_DIV_4   = (0x09 << RCC_HPRE_OFFSET),
+    RCC_AHB_DIV_8   = (0x0A << RCC_HPRE_OFFSET),
+    RCC_AHB_DIV_16  = (0x0B << RCC_HPRE_OFFSET),
+    RCC_AHB_DIV_64  = (0x0C << RCC_HPRE_OFFSET),
+    RCC_AHB_DIV_128 = (0x0D << RCC_HPRE_OFFSET),
+    RCC_AHB_DIV_256 = (0x0E << RCC_HPRE_OFFSET),
+    RCC_AHB_DIV_512 = (0x0F << RCC_HPRE_OFFSET),
 } rcc_ahb_pre_t;
 
 
@@ -215,7 +215,7 @@ volatile static clock_t *rcc_active_clock;
 
 void RCC_system_clock_config(clock_t clock);
 
-void RCC_periphclock_select(rcc_clock_port_t port, uint32_t periph, uint8_t enable);
+void RCC_periphclock_enable(rcc_clock_port_t port, uint32_t periph, uint8_t enable);
 void RCC_set_pllm_pre(uint32_t pll_m);
 void RCC_set_plln_pre(uint32_t pll_n);
 void RCC_set_pllp_pre(uint32_t pll_p);

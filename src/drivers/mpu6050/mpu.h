@@ -97,11 +97,9 @@
 #define GYRO_CONF_OFFSET    0x03
 #define ACCEL_CONF_OFFSET   0x03
 
-#define MPU_NUM_CALIBRATIONS    (100)
+#define MPU_NUM_CALIBRATIONS    (1000)
 #define MPU_MAX_ERRORS          (0x0A)
 
-static int16_t mpu_gyro_calib[3];
-static int16_t mpu_accel_calib[3];
 
 /**
  * Gyroscope range in deg/s
@@ -127,6 +125,7 @@ typedef enum _mpu_err_t {
     MPU_OK,
     MPU_ERR_I2C_FAILED,
     MPU_ERR_ARR_SIZE,
+    MPU_ERR_ALREADY_CALIBRATED,
 } mpu_err_t;
 
 
@@ -138,12 +137,14 @@ typedef struct _mpu_t {
     bool alt_addr;
     mpu_gyro_range_t gyro_range; 
     mpu_accel_range_t accel_range;
+    bool _calibrated;
 } mpu_t;
 
 mpu_err_t MPU_init(mpu_t *mpu);
 mpu_err_t MPU_set_gyro_range(mpu_t *mpu);
 mpu_err_t MPU_set_accel_range(mpu_t *mpu);
-mpu_err_t MPU_calibrate(mpu_t mpu);
+mpu_err_t MPU_set_offsets(mpu_t *mpu, int32_t gx, int32_t gy, int32_t gz, int32_t ax, int32_t ay, int32_t az);
+mpu_err_t MPU_calibrate(mpu_t *mpu);
 float     MPU_get_gyro_range(mpu_t mpu);
 int32_t  MPU_get_accel_range(mpu_t mpu);
 
@@ -169,5 +170,6 @@ mpu_err_t MPU_accel_y(mpu_t mpu, float *data);
 mpu_err_t MPU_accel_z(mpu_t mpu, float *data);
 mpu_err_t MPU_accel(mpu_t mpu, float *data, int32_t n);
 // 
+char *MPU_err_str(mpu_err_t err);
 
 #endif

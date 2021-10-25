@@ -7,6 +7,9 @@
 #include "drivers/mpu6050/mpu.h"
 #include "bitutils.h"
 #include "stm32/f4/rcc/rcc.h"
+#include "stm32/f4/timer/timer.h"
+#include "stm32/stm32.h"
+#include "stm32/f4/timer/timer.h"
 //#include "stm32/f4/exti/exti.h"
 
 #define MPU_ADDR    0x68
@@ -29,19 +32,22 @@ uint16_t read_x(I2C_port port, USART_port usart) {
     return (data1 << 8) | data2;
 }
 
+void toggle_test_led(void) {
+    GPIO_toggle(DEBUG_LED);        
+}
+
 
 
 int main(void) {
 
-    //RCC_system_clock_config(rcc_hse_25_mhz_to_96_mhz);   
-
+    RCC_system_clock_config(rcc_hse_25_mhz_to_96_mhz);   
+    cosmicOS_init();
     I2C_port i2c1 = {
         .i2c = I2C1,
         .frequency = 16,
         .mode = I2C_STD_MODE,
         .duty = 0,
     };
-
     USART_port port = {
         .usart = USART2,
         .baud = 115200,
@@ -52,20 +58,17 @@ int main(void) {
         .interrupt_driven = true,
     };
 
-    //USART_port gps = {
-    //    .usart = USART1,
-    //    .baud = 9600,
-    //    .mode = USART_RX_MODE,
-    //    .interrupt_driven = true,
-    //    .stop_bits = 0,
-    //    .parity_enable = 0,
-    //    .parity_even_odd = 0,
-    //};
-
     mpu_t mpu = {
         .accel_range = ACCEL_4G,
         .gyro_range = GYRO_250_DEG_S,
         .port = i2c1,
+    };
+    timer_port_t tim5 = {
+        .timer = TIM5,
+        .prescaler = apb1_freq/1000,
+        .autoreload = 200,
+        .func = toggle_test_led,
+        .interrup_en = true,
     };
     GPIO_enable(DEBUG_LED, GPIO_OUTPUT);
     GPIO_enable(PA8, GPIO_OUTPUT);
@@ -92,71 +95,36 @@ int main(void) {
     //const clock_t *test = &RCC_25MHZ_TO_84MHZ;
     char usart_test[512];
     unsigned long int cycle = 0; 
-    uint8_t bit_test = 0;
+    uint8_t bit_test = 0, data1;
     usart_err_t usart_err;
     USART_printf(port, "APB2 clock: %d\n", ahb_freq);
+    uint32_t last_time = millis();
+    TIM_init(&tim5);
+    float accel[3];
     while (1) {
-        GPIO_toggle(DEBUG_LED);
-                
-        //if (USART_available(gps)) {
-        //    usart_err = USART_scan(gps, usart_test, 512);
-        //    if (usart_err != USART_OK) {
-        //        USART_printf(port, "[x] cannot scan GPS\n");
-        //    }
-        //    USART_printf(port, "%s\n", usart_test);
-        //}
-        //USART_printf(gps, "Hello USART\n");
-        //USART_scan(gps, usart_test, 512);
-        //USART_printf(port, "%s\n", usart_test);
-
-        //if (USART_printf(port, "Cycle: %d\n", cycle++) != USART_OK) {
-        //    USART_printf(port, "[x] printing did not work\n");
-        //}
-
-        //USART_printf(USART2, "This is a value: %.3f\n", 2.123);
-        //USART_printf(&port, "x: %6d\n", read_x(&i2c1));
-        //i2c_err = I2C_read(i2c1, MPU_ADDR, 0x3C, &i2c_data);
-        //USART_printf(port, "%s\n", I2C_get_err_str(i2c_err)); 
-        //uint16_t mpu_test = read_x(i2c1, port); 
-        //USART_printf(port, "Gyro -> X: %5d    Y: %5d    Z: %5d        Accel -> X: %5d    Y: %5d    Z: %5d\r", 
-        //        MPU_gyro_x_raw(mpu), 
-        //        MPU_gyro_y_raw(mpu), 
-        //        MPU_gyro_z_raw(mpu),
-        //        MPU_accel_x_raw(mpu),
-        //        MPU_accel_y_raw(mpu),
-        //        MPU_accel_z_raw(mpu)
-        //);
-
-
-
-        float gyro[3], accel[3];
-        mpu_err = MPU_gyro(mpu, gyro, 3);
-        if (mpu_err != MPU_OK) {
-            USART_printf(port, "[x] Gyroscope reading failed\n");
-        }
-        //delayMs(2);
-        mpu_err = MPU_accel(mpu, accel, 3);
-        if (mpu_err != MPU_OK) {
-            USART_printf(port, "[x] Accelerometer reading failed\n");
-        }
-        //MPU_calibrate(mpu);
-        if (mpu_err == MPU_OK) {
-            USART_printf(port, "Gyro ->  X: % -9.3f  Y: % -9.3f  Z: % -9.3f    Accel ->  X: % -9.3f  Y: % -9.3f  Z: % -9.3f\r", gyro[0], gyro[1], gyro[2], accel[0], accel[1], accel[2]);
-        }
-        //int32_t accel_raw[3];
-        //mpu_err = MPU_accel_raw(mpu, accel_raw);
+        USART_printf(port, "cycle: %d\n", cycle++);
+        //GPIO_toggle(DEBUG_LED);        
+        //while(!(TIM5->SR & 1));
+        //TIM5->SR &= ~(1);
+        //float gyro[3], accel[3];
+        //mpu_err = MPU_gyro(mpu, gyro, 3);
         //if (mpu_err != MPU_OK) {
-        //    USART_printf(port, "[x] MPU error\n");
+        //    USART_printf(port, "[x] Gyroscope reading failed\n");
         //}
-        //USART_printf(port, "accel ->  X: %4d  Y: %4d  Z: %4d\n", accel_raw[0], accel_raw[1], accel_raw[2]);
-
-        //i2c_err = I2C_read_burst(i2c1, MPU_ADDR, 0x43, 2, i2c_data);
-        //USART_printf(port, "%s\n", I2C_get_err_str(i2c_err));
-        //USART_printf(port, "%d\n", (int16_t)(i2c_data[0] << 8) | i2c_data[1]);
-                
-
-
-        delayMs(100);
+        ////delayMs(2);
+        i2c_err = I2C_read(i2c1, MPU_ADDR, 0x3B, &data1);
+        if (i2c_err != I2C_OK) {
+            USART_printf(port, "%s\n", I2C_get_err_str(i2c_err));
+        }
+        //mpu_err = MPU_accel(mpu, accel, 3);
+        //if (mpu_err != MPU_OK) {
+        //    USART_printf(port, "[x] Accelerometer reading failed\n");
+        //}
+        ////MPU_calibrate(mpu);
+        //if (mpu_err == MPU_OK) {
+        //    USART_printf(port, "Gyro ->  X: % -9.3f  Y: % -9.3f  Z: % -9.3f    Accel ->  X: % -9.3f  Y: % -9.3f  Z: % -9.3f\r", gyro[0], gyro[1], gyro[2], accel[0], accel[1], accel[2]);
+        //}
+        delayMs(500);
     }
 }
 
