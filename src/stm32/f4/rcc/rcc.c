@@ -137,6 +137,7 @@ void RCC_system_clock_config(clock_t clock) {
     apb2_freq = clock.apb2_freq;
 
     RCC_reset_osc(RCC_OSC_HSI);
+    SystemCoreClockUpdate();
 }
 
 

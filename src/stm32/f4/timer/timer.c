@@ -32,7 +32,7 @@ tim_err_t TIM_init(const struct timer_port *port) {
         port->timer->DIER |= TIM_UIE;
         _TIM_NVIC_enable(port);
     }
-
+    port->timer->CR1 |= TIM_CR1_CEN;
     return TIM_OK;
 }
 
@@ -116,13 +116,6 @@ tim_err_t TIM_set_dir(const struct timer_port *port) {
     return TIM_OK;
 }
 
-uint32_t millis() {
-    return TIM5->CNT;
-}
-
-uint32_t micros() {
-    return TIM5->CNT;
-}
 
 void _TIM_NVIC_enable(const struct timer_port *port) {
     if (port->timer == TIM2) {

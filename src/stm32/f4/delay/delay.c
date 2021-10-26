@@ -6,7 +6,7 @@
 volatile uint32_t syscount = 0;
 
 void delayMs(uint32_t ms) {
-    SysTick->LOAD = (apb1_freq/1000);
+    SysTick->LOAD = (ahb_freq/1000)-1;
     SysTick->VAL = 0x00;
 
     SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
@@ -19,7 +19,7 @@ void delayMs(uint32_t ms) {
 
 
 void delayUs(uint32_t us) {
-    SysTick->LOAD = (apb1_freq/1000)/1000;
+    SysTick->LOAD = (ahb_freq/1000)/1000;
     SysTick->VAL = 0x00;
 
     SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
