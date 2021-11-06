@@ -4,14 +4,16 @@
 #include "../rcc/rcc.h"
 
 
-tim_err_t TIM_init(const struct timer_port *port) {
+tim_err_t TIM_init(const struct _timer *port) {
     // check if Timer port is NULL
     if (port->timer == NULL) {
         return TIM_ERR_CONFIG_NO_TIMER;
     }
     // check if prescaler or autoreload value is = 0
-    if (port->prescaler == 0 || port->prescaler >= TIM_MAX_PSC) {
-        return TIM_ERR_CONFIG_PRESCALER;
+    if (port->prescaler >= TIM_MAX_PSC) {
+        return TIM_ERR_CONFIG_PRESCALER_OVERFLOW;
+    } else if (port->prescaler == 0) {
+        return TIM_ERR_CONFIG_PRESCALER_ZERO;
     }
     // check if timer is not 32-bit and value is >16-bit
     if (!(port->timer == TIM2 || port->timer == TIM5) && 
@@ -37,11 +39,11 @@ tim_err_t TIM_init(const struct timer_port *port) {
 }
 
 
-bool TIM_is_TIM2_5(const struct timer_port *port) {
+bool TIM_is_TIM2_5(const struct _timer *port) {
     return (port->timer==TIM2)||(port->timer==TIM3)||(port->timer==TIM4)||(port->timer==TIM5);
 }
 
-void TIM_rcc_enable(const struct timer_port *port) {
+void TIM_rcc_enable(const struct _timer *port) {
     if (port->timer == TIM2) {
         RCC_periphclock_enable(RCC_APB1, RCC_APB1_TIM2, RCC_ENABLE);
         tim2_it_func = port->func;
@@ -69,7 +71,7 @@ void TIM_rcc_enable(const struct timer_port *port) {
     }
 }
 
-void TIM_rcc_disable(const struct timer_port *port) {
+void TIM_rcc_disable(const struct _timer *port) {
     if (port->timer == TIM2) {
         RCC_periphclock_enable(RCC_APB1, RCC_APB1_TIM2, RCC_DISABLE);
     } else if (port->timer == TIM3) {
@@ -89,35 +91,35 @@ void TIM_rcc_disable(const struct timer_port *port) {
     }
 }
 
-tim_err_t TIM_set_prescaler(const struct timer_port *port) {
+tim_err_t TIM_set_prescaler(const struct _timer *port) {
     if (port->timer == NULL) {
         return TIM_ERR_CONFIG_NO_TIMER;
     }
-    port->timer->PSC = (port->prescaler)-1;
+    port->timer->PSC = (port->prescaler);//-1;
     return TIM_OK;
 }
 
-tim_err_t TIM_set_autoreload(const struct timer_port *port) {
+tim_err_t TIM_set_autoreload(const struct _timer *port) {
     if (port->timer == NULL) {
         return TIM_ERR_CONFIG_NO_TIMER;
     }
-    port->timer->ARR = (port->autoreload);
+    port->timer->ARR = (port->autoreload)-1;
     return TIM_OK;
 }
 
-tim_err_t TIM_reset_count(const struct timer_port *port) {
+tim_err_t TIM_reset_count(const struct _timer *port) {
     port->timer->CNT = 0;
     return TIM_OK;
 }
 
-tim_err_t TIM_set_dir(const struct timer_port *port) {
+tim_err_t TIM_set_dir(const struct _timer *port) {
     port->timer->CR1 &= ~TIM_DIR_DOWN;
     port->timer->CR1 |= port->dir;
     return TIM_OK;
 }
 
 
-void _TIM_NVIC_enable(const struct timer_port *port) {
+void _TIM_NVIC_enable(const struct _timer *port) {
     if (port->timer == TIM2) {
         NVIC_EnableIRQ(TIM2_IRQn);
     } else if (port->timer == TIM3) {
@@ -176,4 +178,18 @@ void TIM11_IRQHandler(void) {
         tim11_it_func();
         TIM11->SR &= ~(TIM_UIE_FLAG);
     }
+}
+
+
+char *TIM_err_str(const tim_err_t err) {
+    switch(err) {
+        case TIM_ERR_CONFIG_NO_TIMER:
+            return "No timer on 'timer_port.timer' structure";
+        case TIM_ERR_CONFIG_PRESCALER_OVERFLOW:
+            return "Prescaler value too high -> set less than 0xFFFF";
+        case TIM_ERR_CONFIG_PRESCALER_ZERO:
+            return "Prescaler value is 0 -> set higher than 0";
+        default:
+            return "Ok!";
+    } 
 }

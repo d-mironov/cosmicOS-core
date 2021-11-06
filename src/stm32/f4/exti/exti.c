@@ -5,7 +5,7 @@
 
 
 
-exti_err_t EXTI_select_trigger(uint32_t lines, exti_trigger_t trigger) {
+exti_err_t EXTI_select_trigger(u32 lines, exti_trigger_t trigger) {
     if (lines & EXTI_RESERVED) {
         return EXTI_LINES_RESERVED;
     }
@@ -32,7 +32,7 @@ exti_err_t EXTI_select_trigger(uint32_t lines, exti_trigger_t trigger) {
 
 
 
-exti_err_t EXTI_unmask(uint32_t lines) {
+exti_err_t EXTI_unmask(u32 lines) {
     if (lines & EXTI_RESERVED) {
         return EXTI_LINES_RESERVED;
     }
@@ -43,7 +43,7 @@ exti_err_t EXTI_unmask(uint32_t lines) {
 }
 
 
-exti_err_t EXTI_nvic_enable_irq(uint8_t pin) {
+exti_err_t EXTI_nvic_enable_irq(u8 pin) {
     if (pin == 0) {
         NVIC_EnableIRQ(EXTI0_IRQn);
     } else if (pin == 1) {
@@ -79,8 +79,8 @@ exti_err_t EXTI_attach_gpio(const gpio_pin_t pin, exti_trigger_t trigger) {
     }
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
-    // uint8_t cr = (pin / 4) % 4;
-    uint8_t exti_port = ((uint64_t) port - AHB1PERIPH_BASE) / 0x00400UL;
+    // u8 cr = (pin / 4) % 4;
+    u8 exti_port = ((uint64_t) port - AHB1PERIPH_BASE) / 0x00400UL;
     // Calculations for port and pin on the EXTI line selection
     // Don't try to understand this, if you don't want you mind to blow up lol
     SYSCFG->EXTICR[(pin/4) % 4] |= (exti_port << ((pin % SYSCFG_EXTI_PORTS_PER_REG) * SYSCFG_EXTI_BITNUM)); 

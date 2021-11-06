@@ -3,14 +3,14 @@
 #include "../rcc/rcc.h"
 #include "../timer/timer.h"
 
-volatile uint32_t syscount = 0;
+volatile u32 syscount = 0;
 
-void delayMs(uint32_t ms) {
-    SysTick->LOAD = (ahb_freq/1000)-1;
+void delayMs(u32 ms) {
+    SysTick->LOAD = (SYSTEM_CLOCK/1000)-1;
     SysTick->VAL = 0x00;
 
     SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
-    for(int i = 0; i < ms; i++) {
+    for(u32 i = 0; i < ms; i++) {
         while((SysTick->CTRL & CTRL_COUNTFLAG) == 0);
     }
 
@@ -18,12 +18,12 @@ void delayMs(uint32_t ms) {
 }
 
 
-void delayUs(uint32_t us) {
-    SysTick->LOAD = (ahb_freq/1000)/1000;
+void delayUs(u32 us) {
+    SysTick->LOAD = (SYSTEM_CLOCK/1000)/1000;
     SysTick->VAL = 0x00;
 
     SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
-    for (int i = 0; i < us; i++) {
+    for (u32 i = 0; i < us; i++) {
         while((SysTick->CTRL & CTRL_COUNTFLAG) == 0);
     }
 

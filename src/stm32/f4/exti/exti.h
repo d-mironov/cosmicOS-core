@@ -46,10 +46,10 @@ typedef enum exti_err {
 } exti_err_t;
 
 
-exti_err_t EXTI_select_trigger(uint32_t lines, exti_trigger_t trigger);
-exti_err_t EXTI_unmask(uint32_t lines);
-exti_err_t EXTI_attach_gpio(const gpio_pin_t pin, exti_trigger_t trigger);
-exti_err_t EXTI_nvic_enable_irq(uint8_t pin);
+exti_err_t  EXTI_select_trigger     (u32 lines, exti_trigger_t trigger);
+exti_err_t  EXTI_unmask             (u32 lines);
+exti_err_t  EXTI_attach_gpio        (const gpio_pin_t pin, exti_trigger_t trigger);
+exti_err_t  EXTI_nvic_enable_irq    (u8 pin);
 
 
 #endif

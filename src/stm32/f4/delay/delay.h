@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "../rcc/rcc.h"
+#include "../../../cosmic.h"
 
 //#define CYCLES_MS   (rcc_active_clock.ahb_freq / 1000)
 
@@ -10,13 +11,13 @@
 #define CTRL_CLKSRC         (1U<<2)
 #define CTRL_COUNTFLAG      (1U<<16)
 
-void delayMs(uint32_t ms);
-void delayMs(uint32_t us);
+void delayMs(u32 ms);
+void delayMs(u32 us);
 
-void delay_ms(uint32_t ms);
-void delay_us(uint32_t ms);
+void delay_ms(u32 ms);
+void delay_us(u32 ms);
 
-//uint32_t millis();
-//uint32_t micros();
+//u32 millis();
+//u32 micros();
 
 #endif

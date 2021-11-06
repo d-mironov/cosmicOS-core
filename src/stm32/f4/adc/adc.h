@@ -84,20 +84,20 @@ typedef enum adc_err {
 } adc_err_t;
 
 typedef struct _ADC_port {
-	ADC_TypeDef *port;
-	gpio_pin_t pin;
-	ADC_mode mode;
-	ADC_resolution resolution;
-	uint8_t _order;
+	ADC_TypeDef*        port;
+	gpio_pin_t          pin;
+	ADC_mode            mode;
+	ADC_resolution      resolution;
+	u8                  _order;
 } ADC_port;
 
-adc_err_t ADC_init(ADC_port *self);
-adc_err_t ADC_deinit(ADC_port *self);
+adc_err_t   ADC_init            (ADC_port *self);
+adc_err_t   ADC_deinit          (ADC_port *self);
 
-adc_err_t ADC_read(ADC_port *self);
-adc_err_t ADC_write(ADC_port *self);
+adc_err_t   ADC_read            (ADC_port *self);
+adc_err_t   ADC_write           (ADC_port *self);
 
-adc_err_t _ADC_is_adc(gpio_pin_t pin);
-int8_t _ADC_fetch_channel(ADC_port *self);
+adc_err_t   _ADC_is_adc         (gpio_pin_t pin);
+i8          _ADC_fetch_channel  (ADC_port *self);
 
 #endif

@@ -12,6 +12,7 @@
 
 #include <stm32f4xx.h>
 #include <stdbool.h>
+#include "../../../cosmic.h"
 
 #define RCC_PLL_Q_OFFSET    (24)
 #define RCC_PLLSRC_OFFSET   (22)
@@ -142,12 +143,12 @@ typedef enum {
  * Clock configuration structure
  */
 typedef struct clock_conf {
-    uint32_t hse_clock;
+    u32 hse_clock;
 
-    uint32_t pll_m;
-    uint32_t pll_n;
-    uint32_t pll_p;
-    uint32_t pll_q;
+    u32 pll_m;
+    u32 pll_n;
+    u32 pll_p;
+    u32 pll_q;
 
     rcc_ahb_pre_t ahb_pre;
     rcc_apb1_pre_t apb1_pre;
@@ -156,16 +157,16 @@ typedef struct clock_conf {
     rcc_pllsrc_t pll_src;
     rcc_sysclksrc_t sysclk_src; 
 
-    uint32_t ahb_freq;
-    uint32_t apb1_freq;
-    uint32_t apb2_freq;
-    uint32_t usb_swio_freq;
+    u32 ahb_freq;
+    u32 apb1_freq;
+    u32 apb2_freq;
+    u32 usb_swio_freq;
 } clock_t;
 
 
-uint32_t ahb_freq;
-uint32_t apb1_freq;
-uint32_t apb2_freq;
+u32 SYSTEM_CLOCK;
+u32 apb1_freq;
+u32 apb2_freq;
 
 typedef enum rcc_clock_port {
     RCC_AHB1,
@@ -213,30 +214,30 @@ volatile static clock_t rcc_hse_25_mhz_to_96_mhz = {
 
 volatile static clock_t *rcc_active_clock;
 
-void RCC_system_clock_config(clock_t clock);
+void RCC_system_clock_config    (clock_t clock);
 
-void RCC_periphclock_enable(rcc_clock_port_t port, uint32_t periph, uint8_t enable);
-void RCC_set_pllm_pre(uint32_t pll_m);
-void RCC_set_plln_pre(uint32_t pll_n);
-void RCC_set_pllp_pre(uint32_t pll_p);
-void RCC_set_pllq_pre(uint32_t pll_q);
-void RCC_set_ahb_pre(rcc_ahb_pre_t ahb_pre);
-void RCC_set_apb1_pre(rcc_apb1_pre_t apb1_pre);
-void RCC_set_apb2_pre(rcc_apb2_pre_t apb2_pre);
+void RCC_periphclock_enable     (rcc_clock_port_t port, u32 periph, u8 enable);
+void RCC_set_pllm_pre           (u32 pll_m);
+void RCC_set_plln_pre           (u32 pll_n);
+void RCC_set_pllp_pre           (u32 pll_p);
+void RCC_set_pllq_pre           (u32 pll_q);
+void RCC_set_ahb_pre            (rcc_ahb_pre_t ahb_pre);
+void RCC_set_apb1_pre           (rcc_apb1_pre_t apb1_pre);
+void RCC_set_apb2_pre           (rcc_apb2_pre_t apb2_pre);
 
-void RCC_set_osc(rcc_osc_t osc);
-void RCC_set_sysclk_src(rcc_sysclksrc_t src);
-void RCC_set_pll_src(rcc_pllsrc_t src);
+void RCC_set_osc                (rcc_osc_t osc);
+void RCC_set_sysclk_src         (rcc_sysclksrc_t src);
+void RCC_set_pll_src            (rcc_pllsrc_t src);
 
-void RCC_reset_osc(rcc_osc_t osc);
-void RCC_reset_ahb_pre(rcc_ahb_pre_t ahb_pre);
-void RCC_reset_apb1_pre(rcc_apb1_pre_t apb1_pre);
-void RCC_reset_apb2_pre(rcc_apb2_pre_t apb2_pre);
+void RCC_reset_osc              (rcc_osc_t osc);
+void RCC_reset_ahb_pre          (rcc_ahb_pre_t ahb_pre);
+void RCC_reset_apb1_pre         (rcc_apb1_pre_t apb1_pre);
+void RCC_reset_apb2_pre         (rcc_apb2_pre_t apb2_pre);
 
-bool RCC_osc_rdy(rcc_osc_t osc);
-void RCC_wait_osc_rdy(rcc_osc_t osc);
-bool RCC_sysclk_rdy(rcc_sysclksrc_t src);
-void RCC_wait_sysclk_rdy(rcc_sysclksrc_t src);
+bool RCC_osc_rdy                (rcc_osc_t osc);
+void RCC_wait_osc_rdy           (rcc_osc_t osc);
+bool RCC_sysclk_rdy             (rcc_sysclksrc_t src);
+void RCC_wait_sysclk_rdy        (rcc_sysclksrc_t src);
 
 
 

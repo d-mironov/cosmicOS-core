@@ -74,7 +74,7 @@ gpio_err_t GPIO_init(gpio_init_t *gpio) {
 }
 
 
-gpio_err_t GPIO_select_alternate(const gpio_pin_t pin, const uint8_t af) {
+gpio_err_t GPIO_select_alternate(const gpio_pin_t pin, const u8 af) {
     if ( pin > PH15 ) {
         return GPIO_PIN_TOO_HIGH;
     }
@@ -87,7 +87,7 @@ gpio_err_t GPIO_select_alternate(const gpio_pin_t pin, const uint8_t af) {
         return GPIO_ALTERNATE_NOT_SELECTED;
     }
     */
-    uint8_t raw_pin = pin % PINS_PER_PORT;
+    u8 raw_pin = pin % PINS_PER_PORT;
     GPIO_TypeDef *port = _GPIO_fetch_port(pin);
     if (port == NULL) {
         return GPIO_PIN_TOO_HIGH;
@@ -115,7 +115,7 @@ gpio_err_t GPIO_select_alternate(const gpio_pin_t pin, const uint8_t af) {
  *
  * @return GPIO_OK on success, GPIO_PIN_TOO_HIGH when `pin`>15
  */
-gpio_err_t GPIO_settings(const gpio_pin_t pin, const uint8_t speed, const uint8_t pull_up_down, const uint8_t push_pull_open_drain) {
+gpio_err_t GPIO_settings(const gpio_pin_t pin, const u8 speed, const u8 pull_up_down, const u8 push_pull_open_drain) {
     if (pin > PH15) {
         return GPIO_PIN_TOO_HIGH;
     } else if (speed > GPIO_HIGH_SPEED || 
@@ -154,7 +154,7 @@ gpio_err_t GPIO_settings(const gpio_pin_t pin, const uint8_t speed, const uint8_
  * @return errorcode
  *
  */
-gpio_err_t GPIO_set_speed(const gpio_pin_t pin, const uint8_t speed) {
+gpio_err_t GPIO_set_speed(const gpio_pin_t pin, const u8 speed) {
     GPIO_TypeDef *port = _GPIO_fetch_port(pin);
     if (port == NULL) {
         return GPIO_PIN_TOO_HIGH;
@@ -168,7 +168,7 @@ gpio_err_t GPIO_set_speed(const gpio_pin_t pin, const uint8_t speed) {
 
 
 
-gpio_err_t GPIO_set_pull_up_down(const gpio_pin_t pin, const uint8_t pull_up_down) {
+gpio_err_t GPIO_set_pull_up_down(const gpio_pin_t pin, const u8 pull_up_down) {
     GPIO_TypeDef *port = _GPIO_fetch_port(pin);
     if (port == NULL) {
         return GPIO_PIN_TOO_HIGH;
@@ -213,7 +213,7 @@ gpio_err_t GPIO_toggle(const gpio_pin_t pin) {
  *
  * @return GPIO_OK
  */
-gpio_err_t GPIO_write(const gpio_pin_t pin, const uint8_t on_off) {
+gpio_err_t GPIO_write(const gpio_pin_t pin, const u8 on_off) {
     GPIO_TypeDef *port = _GPIO_fetch_port(pin);
     if (port == NULL) {
         return GPIO_PIN_TOO_HIGH;
@@ -236,7 +236,7 @@ gpio_err_t GPIO_write(const gpio_pin_t pin, const uint8_t on_off) {
  *
  * @return digital value of pin
  */
-uint8_t GPIO_read_digital(const gpio_pin_t pin) {
+u8 GPIO_read_digital(const gpio_pin_t pin) {
     GPIO_TypeDef *port = _GPIO_fetch_port(pin);
     if (port == NULL) {
         return 0;

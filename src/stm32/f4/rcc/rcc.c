@@ -2,11 +2,11 @@
 #include <stm32f4xx.h>
 #include "../pwr/pwr.h"
 
-uint32_t ahb_freq = 16000000;
-uint32_t apb1_freq = 16000000;
-uint32_t apb2_freq = 16000000;
+u32 SYSTEM_CLOCK = 16000000;
+u32 apb1_freq = 16000000;
+u32 apb2_freq = 16000000;
 
-void RCC_periphclock_enable(rcc_clock_port_t port, uint32_t periph_enable, uint8_t enable) {
+void RCC_periphclock_enable(rcc_clock_port_t port, u32 periph_enable, u8 enable) {
     if (enable == RCC_ENABLE) {
         if (port == RCC_AHB1) {
             RCC->AHB1ENR |= periph_enable;
@@ -35,25 +35,25 @@ void RCC_periphclock_enable(rcc_clock_port_t port, uint32_t periph_enable, uint8
 /**
  * Sets the PLL M prescaler
  */
-void RCC_set_pllm_pre(uint32_t pll_m) {
+void RCC_set_pllm_pre(u32 pll_m) {
     RCC->PLLCFGR |= (pll_m << RCC_PLL_M_OFFSET);
 }
 /**
  * Sets the PLL N prescaler
  */
-void RCC_set_plln_pre(uint32_t pll_n) {
+void RCC_set_plln_pre(u32 pll_n) {
     RCC->PLLCFGR |= (pll_n << RCC_PLL_N_OFFSET);
 }
 /**
  * Sets the PLL P prescaler
  */
-void RCC_set_pllp_pre(uint32_t pll_p) {
+void RCC_set_pllp_pre(u32 pll_p) {
     RCC->PLLCFGR |= pll_p;
 }
 /**
  * Sets the PLL Q prescaler
  */
-void RCC_set_pllq_pre(uint32_t pll_q) {
+void RCC_set_pllq_pre(u32 pll_q) {
     RCC->PLLCFGR |= pll_q;
 }
 
@@ -132,7 +132,7 @@ void RCC_system_clock_config(clock_t clock) {
     RCC_set_sysclk_src(RCC_SYSCLK_PLL);
     RCC_wait_sysclk_rdy(RCC_SYSCLK_PLL);
 
-    ahb_freq = clock.ahb_freq;
+    SYSTEM_CLOCK = clock.ahb_freq;
     apb1_freq = clock.apb1_freq;
     apb2_freq = clock.apb2_freq;
 

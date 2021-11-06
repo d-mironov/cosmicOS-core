@@ -19,7 +19,7 @@
  *
  * @return usart_err_t `USART_UNDEFINED` if `port.usart=NULL`, `USART_OK` on success
  */
-usart_err_t USART_init(USART_port *port) {
+usart_err_t USART_init(USART *port) {
     if (port == NULL) {
         return USART_ERR_UNDEFINED;
     }
@@ -91,7 +91,7 @@ usart_err_t USART_init(USART_port *port) {
  *
  * @return Error code (USART_OK on success, USART_IT_BUF_FULL on interrupt buffer overflow)
  */
-usart_err_t USART_write(USART_port port, int ch) {
+usart_err_t USART_write(USART port, i32 ch) {
     if (!port.interrupt_driven) {
         while(!((port.usart)->SR & USART_SR_TXE));
         (port.usart)->DR = (ch & 0xFF);
@@ -119,7 +119,7 @@ usart_err_t USART_write(USART_port port, int ch) {
  * @param periph_clk clock speed of given USART
  * @param baud baud rate
  */
-uint16_t USART_compute_div(uint32_t periph_clk, uint32_t baud) {
+u16 USART_compute_div(u32 periph_clk, u32 baud) {
     return (periph_clk + (baud/2U)) / baud; 
 }
 
@@ -130,7 +130,7 @@ uint16_t USART_compute_div(uint32_t periph_clk, uint32_t baud) {
  * @param port USART port
  * @return -1 if no input, characte read on input
  */
-int16_t USART_read(USART_port port) {
+i16 USART_read(USART port) {
     char ch;
     
     __usart_it_handle *buf;
@@ -143,7 +143,7 @@ int16_t USART_read(USART_port port) {
 }
 
 
-uint8_t USART_getc(USART_port port) {
+u8 USART_getc(USART port) {
     volatile int ch;
     do {
         ch = USART_read(port);
@@ -168,7 +168,7 @@ uint8_t USART_getc(USART_port port) {
  *
  * @return usart_err_t `USART_OK` on success
  */
-usart_err_t USART_scan(USART_port port, char *buf, int len) {
+usart_err_t USART_scan(USART port, char *buf, i32 len) {
     volatile int buf_i = 0;
     int c = USART_read(port);
     while (c != -1) {
@@ -193,7 +193,7 @@ usart_err_t USART_scan(USART_port port, char *buf, int len) {
  *
  * @return USART error code (USART_OK on success, USART_IT_BUF_FULL on interrupt buffer overflow)
  */
-usart_err_t USART_printf(USART_port port, const char *format, ...) {
+usart_err_t USART_printf(USART port, const string format, ...) {
     char buff[USART_CHAR_BUFFER_LEN];
 
     va_list args;
@@ -214,7 +214,7 @@ usart_err_t USART_printf(USART_port port, const char *format, ...) {
 }
 
 
-bool USART_available(USART_port port) {
+bool USART_available(USART port) {
     if (port.__it_buf->rx_in != port.__it_buf->rx_out) {
         return true;
     }
@@ -230,7 +230,7 @@ bool USART_available(USART_port port) {
  * 
  * @param `port` USART port struct to enable interrupt
  */
-inline void USART_interrupt_enable(USART_port *port) {
+inline void USART_interrupt_enable(USART *port) {
     if (port->usart == USART1) {
         NVIC_EnableIRQ(USART1_IRQn);
     } else if (port->usart == USART2) {
@@ -248,7 +248,7 @@ inline void USART_interrupt_enable(USART_port *port) {
  * 
  * @param `port` USART port struct to enable interrupt
  */
-inline void USART_interrupt_disable(USART_port *port) {
+inline void USART_interrupt_disable(USART *port) {
     if (port->usart == USART1) {
         NVIC_DisableIRQ(USART1_IRQn);
     } else if (port->usart == USART2) {
@@ -259,7 +259,7 @@ inline void USART_interrupt_disable(USART_port *port) {
 }
 
 
-void USART_disable(USART_port *port) {
+void USART_disable(USART *port) {
     (port->usart)->CR1 &= ~(USART_CR1_UE);
     if ( port->usart == USART1) {
         RCC->APB1RSTR |= RCC_APB2RSTR_USART1RST;

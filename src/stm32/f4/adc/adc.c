@@ -24,8 +24,8 @@ adc_err_t ADC_init(ADC_port *self) {
 		self->port->CR2 &= ~(1U << ADC_CR2_ADON_OFFSET);
 	}
 	self->port->CR2 &= ~(1 << ADC_CR2_SWSTART_OFFSET);
-	volatile int num_conv = 0;
-	for (int i = 1, reg_sub = 0x1F, reg = 3, bit = 0; i <= ADC_NUM_CHANNELS; i++, reg_sub<<=5, bit+=5) {
+	volatile i32 num_conv = 0;
+	for (i32 i = 1, reg_sub = 0x1F, reg = 3, bit = 0; i <= ADC_NUM_CHANNELS; i++, reg_sub<<=5, bit+=5) {
 		if (reg == 3) {
 			if ((ADC1->SQR3 & reg_sub) == 0 && _ADC_fetch_channel(self) != -1) {
 				ADC1->SQR3 |= (_ADC_fetch_channel(self) << bit);
@@ -89,7 +89,7 @@ adc_err_t ADC_deinit(ADC_port *self) {
 		self->port->SQR1 &= ~(0x1F << ((self->_order % ADC_NUM_CHANNELS_SQR2) - 1) * 5);
 	}
 	//uint8_t l_bit = (self->port->SQR1 & (0x0F << ADC_SQR1_LBIT_OFFSET)) == 0 ? 0 : (self->port->SQR1 & (0x0F << ADC_SQR1_LBIT_OFFSET)) - 1;
-	volatile int l_bit = ((self->port->SQR1 & (0xF << ADC_SQR1_LBIT_OFFSET)) >> ADC_SQR1_LBIT_OFFSET) - 1;
+	volatile i32 l_bit = ((self->port->SQR1 & (0xF << ADC_SQR1_LBIT_OFFSET)) >> ADC_SQR1_LBIT_OFFSET) - 1;
 	//volatile int l_bit = self->port->SQR1 & ;
 	self->port->SQR1 &= ~(0x0F << ADC_SQR1_LBIT_OFFSET);
 	self->port->SQR1 |= (l_bit << ADC_SQR1_LBIT_OFFSET);
@@ -106,7 +106,7 @@ adc_err_t _ADC_is_adc(gpio_pin_t pin) {
 	return ADC_ERR_PIN_NOT_ADC;
 }
 
-int8_t _ADC_fetch_channel(ADC_port *self) {
+i8 _ADC_fetch_channel(ADC_port *self) {
 	if (_ADC_is_adc(self->pin) != ADC_OK) {
 		return -1;
 	}
