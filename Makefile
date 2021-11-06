@@ -5,7 +5,7 @@
 all:
 	pio -f -c vim run
 
-upload:
+flash:
 	pio -f -c vim run --target upload
 
 clean:
