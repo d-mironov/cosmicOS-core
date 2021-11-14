@@ -158,7 +158,7 @@ i2c_err_t I2C_read(I2C port, u8 slave, u8 memaddr, u8 *data) {
     u8 out;
     i2c_err_t err;
     // TODO: fix infinite loop on wrong device
-    GPIO_write(PA8, GPIO_ON);
+    //GPIO_write(PA8, GPIO_ON);
     SysTick->LOAD = (apb1_freq/1000);
     SysTick->VAL = 0x00;
     SysTick->CTRL = CTRL_ENABLE | CTRL_CLKSRC;
@@ -494,7 +494,7 @@ i2c_err_t _I2C_send_stop(I2C port) {
     return I2C_OK;
 }
 
-string I2C_get_err_str(i2c_err_t err) {
+str I2C_get_err_str(i2c_err_t err) {
     switch (err) {
         case I2C_ERR_AF:
             return "[I2C] acknowledge failure";

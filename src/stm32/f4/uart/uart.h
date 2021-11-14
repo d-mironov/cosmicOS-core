@@ -205,7 +205,7 @@ static __usart_it_handle __buf_usart6 = {
 usart_err_t     USART_init                      (USART *port);
 
 usart_err_t     USART_write                     (USART port, i32 ch);
-usart_err_t     USART_printf                    (USART port, const string format, ...);
+usart_err_t     USART_printf                    (USART port, const str format, ...);
 
 i16             USART_read                      (USART port);
 u8              USART_getc                      (USART port);

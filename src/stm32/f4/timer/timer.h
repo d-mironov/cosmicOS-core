@@ -66,7 +66,7 @@ bool TIM_is_TIM2_5(const struct _timer *port);
 void TIM_rcc_enable(const struct _timer *port);
 void TIM_rcc_disable(const struct _timer *port);
 
-char *TIM_err_str(const tim_err_t err);
+str TIM_err_str(const tim_err_t err);
 
 void _TIM_NVIC_enable(const struct _timer *port);
 

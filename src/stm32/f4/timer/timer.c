@@ -181,7 +181,7 @@ void TIM11_IRQHandler(void) {
 }
 
 
-char *TIM_err_str(const tim_err_t err) {
+str TIM_err_str(const tim_err_t err) {
     switch(err) {
         case TIM_ERR_CONFIG_NO_TIMER:
             return "No timer on 'timer_port.timer' structure";

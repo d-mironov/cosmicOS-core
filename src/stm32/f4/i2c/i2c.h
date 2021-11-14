@@ -119,7 +119,7 @@ i2c_err_t   I2C_write           (I2C port, u8 slave, u8 memaddr, u8 data);
 i2c_err_t   I2C_write_burst     (I2C port, u8 slave, u8 memaddr, u8 n, u8 *data);
 //errors
 i2c_err_t   I2C_get_err         (I2C port);
-string      I2C_get_err_str     (i2c_err_t err);
+str         I2C_get_err_str     (i2c_err_t err);
 i2c_err_t   I2C_handle_err      (I2C port, i2c_err_t err);
 
 f32         _I2C_ccr_calc       (I2C *port);

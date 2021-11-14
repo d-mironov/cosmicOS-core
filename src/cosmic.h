@@ -3,7 +3,7 @@
 
 #include <stdint.h> 
 
-#define new_string(n)   (char[(n)]){}
+#define from_string(n)   (char[(n)]){}
 
 //#define     u8      uint8_t
 
@@ -23,8 +23,29 @@ typedef int64_t         i64;
 typedef float           f32;
 typedef double          f64;
  
-typedef char*           string;
+typedef char*           str;
 
 typedef uint8_t         byte;
+
+
+typedef struct _vec3 {
+    f32     x;
+    f32     y;
+    f32     z;
+} vec3;
+
+typedef struct _quat {
+    f32     w;
+    f32     x;
+    f32     y;
+    f32     z;
+} quat;
+
+typedef struct _vec4 {
+    f32     x;
+    f32     y;
+    f32     z;
+    f32     w;
+} vec4;
 
 #endif

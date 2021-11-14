@@ -193,7 +193,7 @@ usart_err_t USART_scan(USART port, char *buf, i32 len) {
  *
  * @return USART error code (USART_OK on success, USART_IT_BUF_FULL on interrupt buffer overflow)
  */
-usart_err_t USART_printf(USART port, const string format, ...) {
+usart_err_t USART_printf(USART port, const str format, ...) {
     char buff[USART_CHAR_BUFFER_LEN];
 
     va_list args;
