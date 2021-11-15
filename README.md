@@ -51,5 +51,5 @@ Just contact me here:
 - **Mail:** [mail@moonraccoon.sh](mailto:mail@moonraccoon.sh)
 
 ##License
-Copyright (c) 2020-2021 Daniel M. <mail@moonraccoon.sh>
+Copyright (c) 2020-2021 Daniel M. <mail@moonraccoon.sh>  
 It is licensed under an MIT license. So feel free to use it, just credit me in some way ^^.
