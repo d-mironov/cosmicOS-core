@@ -1,6 +1,7 @@
 # cosmicHAL
 
 The **cosmicHAL** is a small and easy to use Hardware Abstraction Layer to improve development speed and memory safety.  
+A big goal is to make it as modern as possible by looking at some modern features of other languages to make it easier to use.
 This started as a personal project aimed on learning how to program low level hardware and quickly changed to a bigger and more ambitious project.  
 The next step right now is to develop a good, quick and stable build system to speed up project generation, structure and management and also write an install script for such.
 
